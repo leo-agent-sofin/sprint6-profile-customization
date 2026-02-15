@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { UserProfile } from '@/lib/types';
 import { storage } from '@/lib/storage';
 import ProfileHeader from '@/components/ProfileHeader';
-import ActivityDisplay from '@/components/ActivityDisplay';
+import CyclingStats from '@/components/CyclingStats';
 import Link from 'next/link';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -31,11 +31,6 @@ export default function DashboardPage() {
     loadProfile();
   }, []);
 
-  const handleActivityLogged = () => {
-    // Trigger refresh for any components that depend on activity data
-    setRefreshKey(prev => prev + 1);
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
@@ -61,19 +56,19 @@ export default function DashboardPage() {
         {/* Profile Section */}
         <ProfileHeader profile={profile} />
 
-        {/* Activity Section */}
+        {/* Cycling Performance Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                Activity Tracking
+                Cycling Performance
               </h2>
-              <p className="text-gray-600">Build consistency and track your progress</p>
+              <p className="text-gray-600">Track your rides and monitor your progress</p>
             </div>
-            <div className="text-4xl">📈</div>
+            <div className="text-4xl">🚴</div>
           </div>
           
-          <ActivityDisplay key={refreshKey} onActivityLogged={handleActivityLogged} />
+          <CyclingStats key={refreshKey} />
         </div>
 
         {/* Quick Actions */}

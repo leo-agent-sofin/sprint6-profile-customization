@@ -6,13 +6,13 @@ export default function Home() {
       <div className="max-w-2xl w-full">
         <div className="text-center mb-12">
           <h1 className="text-6xl font-bold text-gray-900 mb-4">
-            Sprint 6
+            🚴 Cycling Tracker
           </h1>
           <p className="text-xl text-gray-600 mb-2">
-            Profile Customization Feature
+            Track Your Rides, Monitor Your Progress
           </p>
           <p className="text-sm text-gray-500">
-            Built in 15 minutes 🚀
+            Log rides, view stats, build your cycling habit 🚀
           </p>
         </div>
 
@@ -50,28 +50,28 @@ export default function Home() {
 
         <div className="mt-12 p-6 bg-white rounded-xl shadow-lg">
           <h3 className="text-lg font-semibold mb-3 text-gray-900">
-            ✨ Features Implemented
+            ✨ Features
           </h3>
           <ul className="space-y-2 text-gray-700">
             <li className="flex items-start">
-              <span className="mr-2">✅</span>
-              <span>Edit name, bio, and upload avatar</span>
+              <span className="mr-2">🚴</span>
+              <span>Log rides with distance, elevation, and duration</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✅</span>
-              <span>Avatar history stored in localStorage</span>
+              <span className="mr-2">📊</span>
+              <span>Track total rides, km, elevation, time, and avg speed</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✅</span>
-              <span>Profile data persists across sessions</span>
+              <span className="mr-2">📅</span>
+              <span>7-day calendar with ride distance visualization</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✅</span>
-              <span>Validation: name (1-50 chars), bio (max 500 chars)</span>
+              <span className="mr-2">👤</span>
+              <span>Customizable profile with cycling stats</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✅</span>
-              <span>Three components: EditProfileForm, AvatarSelector, ProfileHeader</span>
+              <span className="mr-2">💾</span>
+              <span>All data persists locally in your browser</span>
             </li>
           </ul>
         </div>
