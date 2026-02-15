@@ -1,4 +1,6 @@
 // Cycling ride management
+export type RouteType = 'flat' | 'hilly' | 'mountain' | 'sprint';
+
 export interface Ride {
   id: string;
   date: string; // YYYY-MM-DD
@@ -6,6 +8,8 @@ export interface Ride {
   elevationGain: number; // meters
   duration: number; // minutes
   avgSpeed: number; // km/h
+  routeType?: RouteType;
+  elevationData?: number[]; // elevation points in meters for charting
 }
 
 const RIDES_KEY = 'rides';
@@ -24,9 +28,37 @@ export const rides = {
     localStorage.setItem(RIDES_KEY, JSON.stringify(rides));
   },
 
+  // Generate mock elevation data for visualization
+  generateElevationData: (distance: number, elevationGain: number): number[] => {
+    const points = Math.max(20, Math.floor(distance * 2)); // 1 point per 0.5km
+    const data: number[] = [];
+    let currentElevation = 100; // Start at 100m
+    
+    for (let i = 0; i < points; i++) {
+      const progress = i / points;
+      // Add some randomness + general trend based on total elevation gain
+      const trend = (elevationGain / points) * (Math.random() * 0.5 + 0.75);
+      const noise = (Math.random() - 0.5) * 10;
+      currentElevation += trend + noise;
+      data.push(Math.max(0, Math.round(currentElevation)));
+    }
+    
+    return data;
+  },
+
   // Add a new ride
   add: (distance: number, elevationGain: number, duration: number): Ride => {
-    const avgSpeed = duration > 0 ? (distance / (duration / 60)) : 0;
+    const calculatedSpeed = duration > 0 ? (distance / (duration / 60)) : 0;
+    const avgSpeed = Math.round(calculatedSpeed * 10) / 10;
+    
+    // Determine route type based on speed and elevation
+    let routeType: RouteType = 'flat';
+    const elevationRatio = elevationGain / distance;
+    if (elevationRatio > 25) routeType = 'mountain';
+    else if (elevationRatio > 10) routeType = 'hilly';
+    else if (avgSpeed > 30) routeType = 'sprint';
+    
+    const elevationData = rides.generateElevationData(distance, elevationGain);
     
     const ride: Ride = {
       id: Date.now().toString(),
@@ -34,7 +66,9 @@ export const rides = {
       distance,
       elevationGain,
       duration,
-      avgSpeed: Math.round(avgSpeed * 10) / 10 // Round to 1 decimal
+      avgSpeed,
+      routeType,
+      elevationData
     };
 
     const allRides = rides.getAll();

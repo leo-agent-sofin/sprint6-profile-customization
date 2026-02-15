@@ -9,6 +9,9 @@ import PersonalBests from '@/components/PersonalBests';
 import Achievements from '@/components/Achievements';
 import StatsExport from '@/components/StatsExport';
 import QRProfileCard from '@/components/QRProfileCard';
+import WeeklyGoalCard from '@/components/WeeklyGoalCard';
+import MonthlyChallenges from '@/components/MonthlyChallenges';
+import GoalCelebrationModal from '@/components/GoalCelebrationModal';
 import OnboardingWizard from '@/components/OnboardingWizard';
 import { SkeletonCard, SkeletonProfile } from '@/components/SkeletonLoader';
 import Link from 'next/link';
@@ -25,6 +28,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationGoalKm, setCelebrationGoalKm] = useState(50);
 
   useEffect(() => {
     const loadProfile = () => {
@@ -87,6 +92,21 @@ export default function DashboardPage() {
           <ProfileHeader profile={profile} />
         </div>
 
+        {/* Weekly Goal Section */}
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
+          <WeeklyGoalCard 
+            onGoalReached={(goalKm) => {
+              setCelebrationGoalKm(goalKm);
+              setShowCelebration(true);
+            }} 
+          />
+        </div>
+
+        {/* Monthly Challenges Section */}
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
+          <MonthlyChallenges />
+        </div>
+
         {/* Cycling Performance Section */}
         <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
           <div className="flex items-center justify-between mb-6">
@@ -125,6 +145,14 @@ export default function DashboardPage() {
           <p className="text-gray-600 mb-6">Generate a beautiful image of your cycling stats to share on social media</p>
           <StatsExport />
         </div>
+
+        {/* Goal Celebration Modal */}
+        {showCelebration && (
+          <GoalCelebrationModal 
+            goalKm={celebrationGoalKm}
+            onClose={() => setShowCelebration(false)}
+          />
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
