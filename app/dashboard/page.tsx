@@ -8,6 +8,7 @@ import CyclingStats from '@/components/CyclingStats';
 import PersonalBests from '@/components/PersonalBests';
 import Achievements from '@/components/Achievements';
 import StatsExport from '@/components/StatsExport';
+import QRProfileCard from '@/components/QRProfileCard';
 import OnboardingWizard from '@/components/OnboardingWizard';
 import { SkeletonCard, SkeletonProfile } from '@/components/SkeletonLoader';
 import Link from 'next/link';
@@ -111,9 +112,16 @@ export default function DashboardPage() {
           <Achievements key={`ach-${refreshKey}`} />
         </div>
 
+        {/* QR Profile Card */}
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📱 Share Your Profile</h2>
+          <p className="text-gray-600 mb-6">Create a QR code card to share your cycling journey</p>
+          <QRProfileCard profile={profile} />
+        </div>
+
         {/* Stats Export */}
         <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">📸 Share Your Progress</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📸 Share Your Stats</h2>
           <p className="text-gray-600 mb-6">Generate a beautiful image of your cycling stats to share on social media</p>
           <StatsExport />
         </div>

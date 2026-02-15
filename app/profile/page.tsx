@@ -10,6 +10,7 @@ import EditProfileForm from '@/components/EditProfileForm';
 import ProfileHeader from '@/components/ProfileHeader';
 import Achievements from '@/components/Achievements';
 import StatsExport from '@/components/StatsExport';
+import QRProfileCard from '@/components/QRProfileCard';
 import { SkeletonProfile, SkeletonCard } from '@/components/SkeletonLoader';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -176,6 +177,19 @@ export default function ProfilePage() {
         {!isEditing && (
           <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
             <Achievements />
+          </div>
+        )}
+
+        {/* QR Profile Card */}
+        {!isEditing && (
+          <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              📱 QR Profile Card
+            </h2>
+            <p className="text-gray-600 mb-6 text-sm">
+              Share your cycling profile with a beautiful QR code card
+            </p>
+            <QRProfileCard profile={profile} />
           </div>
         )}
 
