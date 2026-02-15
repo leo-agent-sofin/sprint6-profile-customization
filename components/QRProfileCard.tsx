@@ -20,7 +20,6 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
   const stats = rides.getTotals();
   const streak = calculateStreak();
   
-  // Generate profile URL
   const username = profile.name.toLowerCase().replace(/\s+/g, '-');
   const profileUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${username}`;
 
@@ -45,20 +44,109 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
     return streak;
   }
 
+  // Convert lab/oklab colors to RGB
+  const sanitizeElementForExport = (element: HTMLElement): HTMLElement => {
+    const clone = element.cloneNode(true) as HTMLElement;
+    
+    // List of elements to sanitize
+    const allElements = clone.querySelectorAll('*');
+    
+    allElements.forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      const computedStyle = window.getComputedStyle(htmlEl);
+      
+      // Get all computed styles and convert lab/oklab to RGB
+      const stylesToConvert = ['color', 'backgroundColor', 'borderColor', 'outlineColor'];
+      
+      stylesToConvert.forEach((styleProp) => {
+        const value = computedStyle.getPropertyValue(styleProp);
+        if (value.includes('lab(') || value.includes('oklab(')) {
+          // Force RGB by setting a fallback color based on context
+          // For the QR card, we know the color scheme
+          if (styleProp === 'color') {
+            htmlEl.style.color = '#FFFFFF'; // White text for dark card
+          } else if (styleProp === 'backgroundColor') {
+            // Keep the gradient we set inline, or use transparent
+            htmlEl.style.backgroundColor = 'transparent';
+          }
+        }
+      });
+      
+      // Remove any Tailwind gradient classes that might use oklab
+      if (htmlEl.classList.contains('bg-gradient-to-br') || 
+          htmlEl.classList.contains('bg-gradient-to-r') ||
+          htmlEl.classList.contains('bg-gradient-to-b')) {
+        // Keep only the essential classes, remove gradient ones
+        // We'll set inline styles instead
+      }
+    });
+    
+    return clone;
+  };
+
   const handleDownload = async () => {
     if (!cardRef.current) return;
     
     setIsExporting(true);
     
     try {
-      const canvas = await html2canvas(cardRef.current, {
+      // Create a clean container with RGB-only colors
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'fixed';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      document.body.appendChild(exportContainer);
+      
+      // Clone the card with sanitized colors
+      const clone = cardRef.current.cloneNode(true) as HTMLElement;
+      
+      // Reset transform for clean export
+      clone.style.transform = 'none';
+      clone.style.width = '1080px';
+      clone.style.height = '1350px';
+      
+      // Ensure all text colors are explicit RGB
+      const allText = clone.querySelectorAll('h1, p, div, span');
+      allText.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const currentColor = htmlEl.style.color;
+        if (!currentColor || currentColor.includes('lab')) {
+          // Determine color based on element type
+          if (htmlEl.tagName === 'H1') {
+            htmlEl.style.color = '#FFFFFF';
+          } else if (htmlEl.classList.contains('text-blue-200') || htmlEl.style.color.includes('blue')) {
+            htmlEl.style.color = '#BFDBFE'; // blue-200 in RGB
+          } else {
+            htmlEl.style.color = '#FFFFFF';
+          }
+        }
+      });
+      
+      // Ensure stat cards have explicit background
+      const statCards = clone.querySelectorAll('[class*="backdrop-blur"]');
+      statCards.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        htmlEl.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        htmlEl.style.backdropFilter = 'none'; // Remove backdrop-filter
+      });
+      
+      exportContainer.appendChild(clone);
+      
+      // Wait for fonts and images
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      const canvas = await html2canvas(clone, {
         scale: 2,
         backgroundColor: null,
         width: 1080,
         height: 1350,
-        windowWidth: 1080,
-        windowHeight: 1350
+        useCORS: true,
+        allowTaint: true,
+        logging: false
       });
+      
+      // Cleanup
+      document.body.removeChild(exportContainer);
       
       const link = document.createElement('a');
       link.download = `sofin-profile-${username}.png`;
@@ -66,6 +154,7 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
       link.click();
     } catch (error) {
       console.error('Export failed:', error);
+      alert('Export failed. Please try again.');
     } finally {
       setIsExporting(false);
     }
@@ -95,9 +184,10 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
               onClick={() => setQRColor(color)}
               className={`px-6 py-2 rounded-lg font-medium transition-all ${
                 qrColor === color
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                  ? 'bg-blue-600 text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
+              style={{ backgroundColor: qrColor === color ? '#2563EB' : undefined }}
             >
               {color.charAt(0).toUpperCase() + color.slice(1)}
             </button>
@@ -114,66 +204,123 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
           height: '1350px', 
           transform: 'scale(0.4)', 
           transformOrigin: 'top left',
-          background: 'linear-gradient(to bottom right, #0f172a 0%, #312e81 50%, #581c87 100%)'
+          background: 'linear-gradient(to bottom right, rgb(15, 23, 42) 0%, rgb(49, 46, 129) 50%, rgb(88, 28, 135) 100%)'
         }}
       >
         {/* Cycling Pattern Background */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 right-20 text-9xl">🚴</div>
-          <div className="absolute bottom-40 left-20 text-9xl">🚴</div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-9xl opacity-50">🚴</div>
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          opacity: 0.1,
+          color: 'rgb(255, 255, 255)'
+        }}>
+          <div style={{ position: 'absolute', top: '80px', right: '80px', fontSize: '120px' }}>🚴</div>
+          <div style={{ position: 'absolute', bottom: '160px', left: '80px', fontSize: '120px' }}>🚴</div>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontSize: '120px', opacity: 0.5 }}>🚴</div>
         </div>
 
-        <div className="relative z-10 flex flex-col items-center justify-between h-full p-20">
+        <div style={{ 
+          position: 'relative', 
+          zIndex: 10, 
+          display: 'flex', 
+          flexDirection: 'column', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          height: '100%', 
+          padding: '80px' 
+        }}>
           {/* Header Section */}
-          <div className="text-center space-y-8 w-full">
+          <div style={{ textAlign: 'center', width: '100%' }}>
             {/* Avatar */}
-            <div className="mx-auto w-64 h-64 rounded-full overflow-hidden border-8 border-white shadow-2xl">
+            <div style={{ 
+              margin: '0 auto', 
+              width: '256px', 
+              height: '256px', 
+              borderRadius: '50%', 
+              overflow: 'hidden', 
+              border: '8px solid rgb(255, 255, 255)', 
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}>
               <img
                 src={profile.avatar_url}
                 alt={profile.name}
-                className="w-full h-full object-cover"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                crossOrigin="anonymous"
               />
             </div>
 
             {/* Name & Location */}
-            <div>
-              <h1 className="text-7xl font-bold text-white mb-4">
+            <div style={{ marginTop: '32px' }}>
+              <h1 style={{ 
+                fontSize: '72px', 
+                fontWeight: 'bold', 
+                color: 'rgb(255, 255, 255)', 
+                marginBottom: '16px',
+                lineHeight: 1.2
+              }}>
                 {profile.name}
               </h1>
               {profile.bio && (
-                <p className="text-4xl text-blue-200">
+                <p style={{ 
+                  fontSize: '36px', 
+                  color: 'rgb(191, 219, 254)'
+                }}>
                   {profile.bio}
                 </p>
               )}
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-3 gap-6 mt-12">
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/20">
-                <div className="text-6xl font-bold text-white mb-2">
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 1fr)', 
+              gap: '24px', 
+              marginTop: '48px' 
+            }}>
+              <div style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+                borderRadius: '24px', 
+                padding: '32px', 
+                border: '2px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <div style={{ fontSize: '60px', fontWeight: 'bold', color: 'rgb(255, 255, 255)', marginBottom: '8px' }}>
                   {stats.totalDistance.toFixed(0)}
                 </div>
-                <div className="text-3xl text-blue-200">Total km</div>
+                <div style={{ fontSize: '30px', color: 'rgb(191, 219, 254)' }}>Total km</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/20">
-                <div className="text-6xl font-bold text-white mb-2">
+              <div style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+                borderRadius: '24px', 
+                padding: '32px', 
+                border: '2px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <div style={{ fontSize: '60px', fontWeight: 'bold', color: 'rgb(255, 255, 255)', marginBottom: '8px' }}>
                   {stats.totalRides}
                 </div>
-                <div className="text-3xl text-blue-200">Rides</div>
+                <div style={{ fontSize: '30px', color: 'rgb(191, 219, 254)' }}>Rides</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border-2 border-white/20">
-                <div className="text-6xl font-bold text-white mb-2">
+              <div style={{ 
+                backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+                borderRadius: '24px', 
+                padding: '32px', 
+                border: '2px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                <div style={{ fontSize: '60px', fontWeight: 'bold', color: 'rgb(255, 255, 255)', marginBottom: '8px' }}>
                   {streak}
                 </div>
-                <div className="text-3xl text-blue-200">Day Streak</div>
+                <div style={{ fontSize: '30px', color: 'rgb(191, 219, 254)' }}>Day Streak</div>
               </div>
             </div>
           </div>
 
           {/* QR Code Section */}
-          <div className="space-y-8">
-            <div className="bg-white rounded-3xl p-12 shadow-2xl">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              backgroundColor: 'rgb(255, 255, 255)', 
+              borderRadius: '24px', 
+              padding: '48px', 
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            }}>
               <QRCodeSVG
                 value={profileUrl}
                 size={400}
@@ -182,22 +329,22 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
                 bgColor={qrBgColors[qrColor]}
               />
             </div>
-            <div className="text-center">
-              <p className="text-4xl font-semibold text-white mb-2">
+            <div style={{ marginTop: '32px' }}>
+              <p style={{ fontSize: '36px', fontWeight: 600, color: 'rgb(255, 255, 255)', marginBottom: '8px' }}>
                 Scan to Follow
               </p>
-              <p className="text-3xl text-blue-200">
+              <p style={{ fontSize: '30px', color: 'rgb(191, 219, 254)' }}>
                 Join me on Sofin
               </p>
             </div>
           </div>
 
           {/* Branding */}
-          <div className="text-center">
-            <div className="text-5xl font-bold text-white mb-2">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', fontWeight: 'bold', color: 'rgb(255, 255, 255)', marginBottom: '8px' }}>
               Sofin
             </div>
-            <div className="text-3xl text-blue-200">
+            <div style={{ fontSize: '30px', color: 'rgb(191, 219, 254)' }}>
               Track Every Mile
             </div>
           </div>
@@ -208,7 +355,8 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
       <button
         onClick={handleDownload}
         disabled={isExporting}
-        className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-indigo-700 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-wait transition-all transform"
+        className="w-full px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold text-lg hover:bg-blue-700 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-wait transition-all transform"
+        style={{ backgroundColor: '#2563EB' }}
       >
         {isExporting ? (
           <span className="flex items-center justify-center gap-2">
