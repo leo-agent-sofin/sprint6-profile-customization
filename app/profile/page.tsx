@@ -6,6 +6,7 @@ import { storage } from '@/lib/storage';
 import { rides } from '@/lib/rides';
 import { social } from '@/lib/social';
 import { achievements } from '@/lib/achievements';
+import { socialFollow } from '@/lib/socialFollow';
 import EditProfileForm from '@/components/EditProfileForm';
 import ProfileHeader from '@/components/ProfileHeader';
 import Achievements from '@/components/Achievements';
@@ -85,11 +86,31 @@ export default function ProfilePage() {
             />
           </div>
         ) : (
-          <ProfileHeader
-            profile={profile}
-            onEdit={() => setIsEditing(true)}
-            showEditButton={true}
-          />
+          <>
+            <ProfileHeader
+              profile={profile}
+              onEdit={() => setIsEditing(true)}
+              showEditButton={true}
+            />
+
+            {/* Follower Stats */}
+            <div className="mt-6 bg-white rounded-xl shadow-lg p-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="text-center p-4 bg-blue-50 rounded-xl">
+                  <div className="text-3xl font-bold text-blue-700">
+                    {socialFollow.getFollowerCount(profile.name)}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">Followers</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-xl">
+                  <div className="text-3xl font-bold text-green-700">
+                    {socialFollow.getFollowingCount(profile.name)}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">Following</div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Cycling Stats */}
