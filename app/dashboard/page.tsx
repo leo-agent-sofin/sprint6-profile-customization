@@ -13,6 +13,7 @@ import WeeklyGoalCard from '@/components/WeeklyGoalCard';
 import MonthlyChallenges from '@/components/MonthlyChallenges';
 import GoalCelebrationModal from '@/components/GoalCelebrationModal';
 import OnboardingWizard from '@/components/OnboardingWizard';
+import RouteTag from '@/components/RouteTag';
 import { SkeletonCard, SkeletonProfile } from '@/components/SkeletonLoader';
 import Link from 'next/link';
 

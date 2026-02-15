@@ -11,6 +11,7 @@ import ProfileHeader from '@/components/ProfileHeader';
 import Achievements from '@/components/Achievements';
 import StatsExport from '@/components/StatsExport';
 import QRProfileCard from '@/components/QRProfileCard';
+import RouteTag from '@/components/RouteTag';
 import { SkeletonProfile, SkeletonCard } from '@/components/SkeletonLoader';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -152,8 +153,11 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-4">
                       <div className="text-2xl">🚴</div>
                       <div>
-                        <div className="font-semibold text-gray-900">
-                          {ride.distance.toFixed(1)} km • {ride.elevationGain} m
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-gray-900">
+                            {ride.distance.toFixed(1)} km • {ride.elevationGain} m
+                          </span>
+                          {ride.routeType && <RouteTag type={ride.routeType} size="sm" />}
                         </div>
                         <div className="text-sm text-gray-600">
                           {formatDuration(ride.duration)} • {ride.avgSpeed.toFixed(1)} km/h avg

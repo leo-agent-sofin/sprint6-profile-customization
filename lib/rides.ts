@@ -19,7 +19,34 @@ export const rides = {
   getAll: (): Ride[] => {
     if (typeof window === 'undefined') return [];
     const data = localStorage.getItem(RIDES_KEY);
-    return data ? JSON.parse(data) : [];
+    const rides = data ? JSON.parse(data) : [];
+    
+    // Migration: add routeType to existing rides
+    const needsMigration = rides.some((r: Ride) => !r.routeType);
+    if (needsMigration) {
+      const migrated = rides.map((r: Ride) => {
+        if (!r.routeType) {
+          const elevationRatio = r.elevationGain / r.distance;
+          let routeType: RouteType = 'flat';
+          if (elevationRatio > 25) routeType = 'mountain';
+          else if (elevationRatio > 10) routeType = 'hilly';
+          else if (r.avgSpeed > 30) routeType = 'sprint';
+          
+          // Generate elevation data too
+          const elevationData = Array.from({ length: Math.max(20, Math.floor(r.distance * 2)) }, (_, i) => {
+            const progress = i / Math.max(20, Math.floor(r.distance * 2));
+            return 100 + (r.elevationGain * progress) + (Math.random() - 0.5) * 20;
+          });
+          
+          return { ...r, routeType, elevationData };
+        }
+        return r;
+      });
+      localStorage.setItem(RIDES_KEY, JSON.stringify(migrated));
+      return migrated;
+    }
+    
+    return rides;
   },
 
   // Save all rides

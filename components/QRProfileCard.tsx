@@ -108,8 +108,14 @@ export default function QRProfileCard({ profile }: QRProfileCardProps) {
       {/* Profile Card */}
       <div
         ref={cardRef}
-        className="relative bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 rounded-2xl overflow-hidden"
-        style={{ width: '1080px', height: '1350px', transform: 'scale(0.4)', transformOrigin: 'top left' }}
+        className="relative rounded-2xl overflow-hidden"
+        style={{ 
+          width: '1080px', 
+          height: '1350px', 
+          transform: 'scale(0.4)', 
+          transformOrigin: 'top left',
+          background: 'linear-gradient(to bottom right, #0f172a 0%, #312e81 50%, #581c87 100%)'
+        }}
       >
         {/* Cycling Pattern Background */}
         <div className="absolute inset-0 opacity-10">
