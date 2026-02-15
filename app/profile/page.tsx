@@ -9,6 +9,7 @@ import { achievements } from '@/lib/achievements';
 import EditProfileForm from '@/components/EditProfileForm';
 import ProfileHeader from '@/components/ProfileHeader';
 import Achievements from '@/components/Achievements';
+import StatsExport from '@/components/StatsExport';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'New User',
@@ -166,6 +167,19 @@ export default function ProfilePage() {
         {!isEditing && (
           <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
             <Achievements />
+          </div>
+        )}
+
+        {/* Stats Export */}
+        {!isEditing && (
+          <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+              📸 Share Your Stats
+            </h2>
+            <p className="text-gray-600 mb-4 text-sm">
+              Generate a beautiful image of your cycling stats to share
+            </p>
+            <StatsExport />
           </div>
         )}
       </div>

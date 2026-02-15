@@ -6,8 +6,12 @@ import { achievements, Achievement } from '@/lib/achievements';
 export default function Achievements() {
   const [allAchievements, setAllAchievements] = useState<Achievement[]>([]);
 
-  useEffect(() => {
+  const loadData = () => {
     setAllAchievements(achievements.getAll());
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   const unlockedCount = allAchievements.filter(a => a.unlocked).length;

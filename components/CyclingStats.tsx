@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import { rides } from '@/lib/rides';
 import RideLogger from './RideLogger';
 
-export default function CyclingStats() {
+interface CyclingStatsProps {
+  onRideLogged?: () => void;
+}
+
+export default function CyclingStats({ onRideLogged }: CyclingStatsProps) {
   const [stats, setStats] = useState({
     totalRides: 0,
     totalDistance: 0,
@@ -26,6 +30,9 @@ export default function CyclingStats() {
 
   const handleRideLogged = () => {
     setRefreshKey(prev => prev + 1);
+    if (onRideLogged) {
+      onRideLogged();
+    }
   };
 
   const formatDate = (dateStr: string) => {

@@ -14,10 +14,14 @@ export default function PersonalBests() {
   const [mostActiveWeek, setMostActiveWeek] = useState<any>(null);
   const [mostActiveMonth, setMostActiveMonth] = useState<any>(null);
 
-  useEffect(() => {
+  const loadData = () => {
     setPbs(achievements.getPersonalBests());
     setMostActiveWeek(achievements.getMostActiveWeek());
     setMostActiveMonth(achievements.getMostActiveMonth());
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   const formatDate = (dateStr: string) => {

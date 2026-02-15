@@ -7,6 +7,7 @@ import ProfileHeader from '@/components/ProfileHeader';
 import CyclingStats from '@/components/CyclingStats';
 import PersonalBests from '@/components/PersonalBests';
 import Achievements from '@/components/Achievements';
+import StatsExport from '@/components/StatsExport';
 import Link from 'next/link';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -70,17 +71,24 @@ export default function DashboardPage() {
             <div className="text-4xl">🚴</div>
           </div>
           
-          <CyclingStats key={refreshKey} />
+          <CyclingStats onRideLogged={() => setRefreshKey(prev => prev + 1)} />
         </div>
 
         {/* Personal Bests Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <PersonalBests key={refreshKey} />
+          <PersonalBests key={`pb-${refreshKey}`} />
         </div>
 
         {/* Achievements Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <Achievements key={refreshKey} />
+          <Achievements key={`ach-${refreshKey}`} />
+        </div>
+
+        {/* Stats Export */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">📸 Share Your Progress</h2>
+          <p className="text-gray-600 mb-6">Generate a beautiful image of your cycling stats to share on social media</p>
+          <StatsExport />
         </div>
 
         {/* Quick Actions */}
