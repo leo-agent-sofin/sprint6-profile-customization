@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cycling Tracker - Track Your Rides",
-  description: "Track your cycling performance, achievements, and personal bests",
+  title: "Sofin - Track Every Mile",
+  description: "Track your rides, join clubs, and share your cycling journey",
 };
 
 export default function RootLayout({

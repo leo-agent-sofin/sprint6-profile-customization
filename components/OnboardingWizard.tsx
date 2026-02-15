@@ -71,7 +71,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
           <div className="text-center space-y-6 animate-fadeIn">
             <div className="text-7xl mb-4">🚴</div>
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Welcome to Cycling Tracker!
+              Welcome to Sofin!
             </h1>
             <p className="text-xl text-gray-600 mb-8">
               Track your rides, smash personal bests, and unlock achievements on your cycling journey.
