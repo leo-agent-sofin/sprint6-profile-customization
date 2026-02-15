@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { rides } from '@/lib/rides';
 import { social } from '@/lib/social';
 import { storage } from '@/lib/storage';
+import { achievements } from '@/lib/achievements';
 
 interface RideLoggerProps {
   onRideLogged?: () => void;
@@ -18,6 +19,8 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showAchievements, setShowAchievements] = useState<string[]>([]);
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -72,6 +75,12 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
         avgSpeed: ride.avgSpeed
       });
 
+      // Check for new achievements
+      const newAchievements = achievements.checkAchievements();
+      
+      // Check for new personal bests
+      const newPBs = achievements.updatePersonalBests();
+
       // Reset form
       setDistance('');
       setElevationGain('');
@@ -82,8 +91,24 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
       setIsSubmitting(false);
 
       // Show success toast
+      if (newAchievements.length > 0) {
+        const achievementNames = newAchievements.map(id => 
+          achievements.getAll().find(a => a.id === id)?.name || id
+        );
+        setToastMessage(`🎉 Achievement Unlocked: ${achievementNames[0]}!`);
+        setShowAchievements(achievementNames);
+      } else if (newPBs.length > 0) {
+        const pbNames = newPBs.map(pb => achievements.formatPBName(pb));
+        setToastMessage(`🏆 New Personal Best: ${pbNames[0]}!`);
+      } else {
+        setToastMessage('Ride Logged!');
+      }
+      
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
+      setTimeout(() => {
+        setShowToast(false);
+        setShowAchievements([]);
+      }, 4000);
 
       if (onRideLogged) {
         onRideLogged();
@@ -102,11 +127,19 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
         </button>
         
         {showToast && (
-          <div className="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce z-50">
-            <span className="text-2xl">🚴</span>
+          <div className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce z-50 ${
+            showAchievements.length > 0 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
+            toastMessage.includes('Personal Best') ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 
+            'bg-green-600'
+          }`}>
+            <span className="text-2xl">
+              {showAchievements.length > 0 ? '🎉' : toastMessage.includes('Personal Best') ? '🏆' : '🚴'}
+            </span>
             <div>
-              <div className="font-semibold">Ride Logged!</div>
-              <div className="text-sm opacity-90">Keep pedaling! 🔥</div>
+              <div className="font-semibold">{toastMessage}</div>
+              <div className="text-sm opacity-90">
+                {showAchievements.length > 0 ? 'Amazing work! 🌟' : 'Keep pedaling! 🔥'}
+              </div>
             </div>
           </div>
         )}
@@ -246,11 +279,19 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
       </form>
 
       {showToast && (
-        <div className="fixed bottom-8 right-8 bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce z-50">
-          <span className="text-2xl">🚴</span>
+        <div className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce z-50 ${
+          showAchievements.length > 0 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
+          toastMessage.includes('Personal Best') ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 
+          'bg-green-600'
+        }`}>
+          <span className="text-2xl">
+            {showAchievements.length > 0 ? '🎉' : toastMessage.includes('Personal Best') ? '🏆' : '🚴'}
+          </span>
           <div>
-            <div className="font-semibold">Ride Logged!</div>
-            <div className="text-sm opacity-90">Keep pedaling! 🔥</div>
+            <div className="font-semibold">{toastMessage}</div>
+            <div className="text-sm opacity-90">
+              {showAchievements.length > 0 ? 'Amazing work! 🌟' : 'Keep pedaling! 🔥'}
+            </div>
           </div>
         </div>
       )}

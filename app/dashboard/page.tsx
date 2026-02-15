@@ -5,6 +5,8 @@ import { UserProfile } from '@/lib/types';
 import { storage } from '@/lib/storage';
 import ProfileHeader from '@/components/ProfileHeader';
 import CyclingStats from '@/components/CyclingStats';
+import PersonalBests from '@/components/PersonalBests';
+import Achievements from '@/components/Achievements';
 import Link from 'next/link';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -69,6 +71,16 @@ export default function DashboardPage() {
           </div>
           
           <CyclingStats key={refreshKey} />
+        </div>
+
+        {/* Personal Bests Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <PersonalBests key={refreshKey} />
+        </div>
+
+        {/* Achievements Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <Achievements key={refreshKey} />
         </div>
 
         {/* Quick Actions */}

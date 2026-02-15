@@ -5,8 +5,10 @@ import { UserProfile } from '@/lib/types';
 import { storage } from '@/lib/storage';
 import { rides } from '@/lib/rides';
 import { social } from '@/lib/social';
+import { achievements } from '@/lib/achievements';
 import EditProfileForm from '@/components/EditProfileForm';
 import ProfileHeader from '@/components/ProfileHeader';
+import Achievements from '@/components/Achievements';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'New User',
@@ -159,6 +161,13 @@ export default function ProfilePage() {
             </div>
           ) : null;
         })()}
+
+        {/* Achievements Section */}
+        {!isEditing && (
+          <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <Achievements />
+          </div>
+        )}
       </div>
     </div>
   );
