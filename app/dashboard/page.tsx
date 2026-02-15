@@ -8,6 +8,8 @@ import CyclingStats from '@/components/CyclingStats';
 import PersonalBests from '@/components/PersonalBests';
 import Achievements from '@/components/Achievements';
 import StatsExport from '@/components/StatsExport';
+import OnboardingWizard from '@/components/OnboardingWizard';
+import { SkeletonCard, SkeletonProfile } from '@/components/SkeletonLoader';
 import Link from 'next/link';
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -21,6 +23,7 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const loadProfile = () => {
@@ -28,18 +31,40 @@ export default function DashboardPage() {
       if (savedProfile) {
         setProfile(savedProfile);
       }
+      
+      // Check if onboarding is complete
+      const onboardingComplete = localStorage.getItem('onboarding_complete');
+      if (!onboardingComplete) {
+        setShowOnboarding(true);
+      }
+      
       setIsLoading(false);
     };
 
     loadProfile();
   }, []);
 
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={() => {
+      setShowOnboarding(false);
+      const savedProfile = storage.getProfile();
+      if (savedProfile) {
+        setProfile(savedProfile);
+      }
+    }} />;
+  }
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <div className="text-xl text-gray-600">Loading your dashboard...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 md:py-12 px-4">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div className="space-y-2">
+            <div className="h-12 w-64 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-6 w-48 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+          <SkeletonProfile />
+          <SkeletonCard />
+          <SkeletonCard />
         </div>
       </div>
     );
@@ -57,10 +82,12 @@ export default function DashboardPage() {
         </div>
 
         {/* Profile Section */}
-        <ProfileHeader profile={profile} />
+        <div className="card-enter">
+          <ProfileHeader profile={profile} />
+        </div>
 
         {/* Cycling Performance Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-1">
@@ -75,17 +102,17 @@ export default function DashboardPage() {
         </div>
 
         {/* Personal Bests Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
           <PersonalBests key={`pb-${refreshKey}`} />
         </div>
 
         {/* Achievements Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
           <Achievements key={`ach-${refreshKey}`} />
         </div>
 
         {/* Stats Export */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+        <div className="card-enter bg-white rounded-2xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-shadow">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">📸 Share Your Progress</h2>
           <p className="text-gray-600 mb-6">Generate a beautiful image of your cycling stats to share on social media</p>
           <StatsExport />
@@ -95,7 +122,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link 
             href="/profile"
-            className="group block p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 border border-gray-100"
+            className="card-enter group block p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border border-gray-100"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="text-5xl group-hover:scale-110 transition-transform">✏️</div>
@@ -113,7 +140,7 @@ export default function DashboardPage() {
 
           <Link 
             href="/feed"
-            className="group block p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 border border-gray-100"
+            className="card-enter group block p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2 border border-gray-100"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="text-5xl group-hover:scale-110 transition-transform">🌟</div>

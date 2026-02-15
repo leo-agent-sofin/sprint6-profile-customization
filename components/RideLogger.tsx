@@ -5,10 +5,13 @@ import { rides } from '@/lib/rides';
 import { social } from '@/lib/social';
 import { storage } from '@/lib/storage';
 import { achievements } from '@/lib/achievements';
+import Toast from './Toast';
 
 interface RideLoggerProps {
   onRideLogged?: () => void;
 }
+
+type ToastType = 'success' | 'info' | 'error' | 'achievement';
 
 export default function RideLogger({ onRideLogged }: RideLoggerProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +23,7 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [showAchievements, setShowAchievements] = useState<string[]>([]);
+  const [toastType, setToastType] = useState<ToastType>('success');
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -95,20 +98,18 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
         const achievementNames = newAchievements.map(id => 
           achievements.getAll().find(a => a.id === id)?.name || id
         );
-        setToastMessage(`🎉 Achievement Unlocked: ${achievementNames[0]}!`);
-        setShowAchievements(achievementNames);
+        setToastMessage(`Achievement Unlocked: ${achievementNames[0]}!`);
+        setToastType('achievement');
       } else if (newPBs.length > 0) {
         const pbNames = newPBs.map(pb => achievements.formatPBName(pb));
-        setToastMessage(`🏆 New Personal Best: ${pbNames[0]}!`);
+        setToastMessage(`New Personal Best: ${pbNames[0]}!`);
+        setToastType('success');
       } else {
-        setToastMessage('Ride Logged!');
+        setToastMessage('Ride logged successfully!');
+        setToastType('success');
       }
       
       setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-        setShowAchievements([]);
-      }, 4000);
 
       if (onRideLogged) {
         onRideLogged();
@@ -121,27 +122,17 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
       <>
         <button
           onClick={() => setIsOpen(true)}
-          className="w-full px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold text-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all transform"
+          className="w-full px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-semibold text-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 transition-all transform"
         >
           🚴 Log Ride
         </button>
         
         {showToast && (
-          <div className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce z-50 ${
-            showAchievements.length > 0 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
-            toastMessage.includes('Personal Best') ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 
-            'bg-green-600'
-          }`}>
-            <span className="text-2xl">
-              {showAchievements.length > 0 ? '🎉' : toastMessage.includes('Personal Best') ? '🏆' : '🚴'}
-            </span>
-            <div>
-              <div className="font-semibold">{toastMessage}</div>
-              <div className="text-sm opacity-90">
-                {showAchievements.length > 0 ? 'Amazing work! 🌟' : 'Keep pedaling! 🔥'}
-              </div>
-            </div>
-          </div>
+          <Toast
+            message={toastMessage}
+            type={toastType}
+            onClose={() => setShowToast(false)}
+          />
         )}
       </>
     );
@@ -264,14 +255,14 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-wait transition-all"
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 hover:shadow-xl hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-wait transition-all transform"
           >
             {isSubmitting ? 'Saving...' : 'Save Ride'}
           </button>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 hover:-translate-y-0.5 active:translate-y-0 transition-all transform"
           >
             Cancel
           </button>
@@ -279,22 +270,13 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
       </form>
 
       {showToast && (
-        <div className={`fixed bottom-8 right-8 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce z-50 ${
-          showAchievements.length > 0 ? 'bg-gradient-to-r from-yellow-500 to-orange-500' : 
-          toastMessage.includes('Personal Best') ? 'bg-gradient-to-r from-purple-600 to-pink-600' : 
-          'bg-green-600'
-        }`}>
-          <span className="text-2xl">
-            {showAchievements.length > 0 ? '🎉' : toastMessage.includes('Personal Best') ? '🏆' : '🚴'}
-          </span>
-          <div>
-            <div className="font-semibold">{toastMessage}</div>
-            <div className="text-sm opacity-90">
-              {showAchievements.length > 0 ? 'Amazing work! 🌟' : 'Keep pedaling! 🔥'}
-            </div>
-          </div>
-        </div>
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setShowToast(false)}
+        />
       )}
+
     </div>
   );
 }

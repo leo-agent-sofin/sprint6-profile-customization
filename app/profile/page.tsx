@@ -10,6 +10,7 @@ import EditProfileForm from '@/components/EditProfileForm';
 import ProfileHeader from '@/components/ProfileHeader';
 import Achievements from '@/components/Achievements';
 import StatsExport from '@/components/StatsExport';
+import { SkeletonProfile, SkeletonCard } from '@/components/SkeletonLoader';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'New User',
@@ -45,8 +46,16 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="space-y-2">
+            <div className="h-10 w-48 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-5 w-64 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+          <SkeletonProfile />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
       </div>
     );
   }
