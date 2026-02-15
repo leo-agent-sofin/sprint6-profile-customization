@@ -43,9 +43,29 @@ export const storage = {
 
   setCurrentAvatar: (url: string): void => {
     const history = storage.getAvatarHistory();
-    history.forEach(item => {
-      item.is_current = item.url === url;
-    });
+    
+    // Check if this URL already exists in history
+    const existingIndex = history.findIndex(item => item.url === url);
+    
+    if (existingIndex >= 0) {
+      // Avatar exists - mark all as not current
+      history.forEach(item => item.is_current = false);
+      // Mark the selected one as current
+      history[existingIndex].is_current = true;
+      // Move it to the front (most recent)
+      const [selected] = history.splice(existingIndex, 1);
+      selected.uploaded_at = new Date().toISOString(); // Update timestamp
+      history.unshift(selected);
+    } else {
+      // New avatar - add it to history
+      history.forEach(item => item.is_current = false);
+      history.unshift({
+        url,
+        uploaded_at: new Date().toISOString(),
+        is_current: true
+      });
+    }
+    
     storage.saveAvatarHistory(history);
   }
 };
