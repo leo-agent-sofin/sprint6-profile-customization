@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { UserProfile } from '@/lib/types';
 import { storage } from '@/lib/storage';
 import { rides } from '@/lib/rides';
+import { social } from '@/lib/social';
 import EditProfileForm from '@/components/EditProfileForm';
 import ProfileHeader from '@/components/ProfileHeader';
 
@@ -111,6 +112,53 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* Recent Rides */}
+        {!isEditing && (() => {
+          const recentRides = rides.getAll().slice(0, 5);
+          const currentUserId = social.getCurrentUserId();
+          const userActivities = social.getUserActivities(currentUserId, 5);
+          
+          const formatDuration = (minutes: number) => {
+            const hours = Math.floor(minutes / 60);
+            const mins = Math.round(minutes % 60);
+            return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+          };
+
+          return recentRides.length > 0 ? (
+            <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                📅 Recent Rides
+              </h2>
+              <div className="space-y-3">
+                {recentRides.map((ride, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="text-2xl">🚴</div>
+                      <div>
+                        <div className="font-semibold text-gray-900">
+                          {ride.distance.toFixed(1)} km • {ride.elevationGain} m
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {formatDuration(ride.duration)} • {ride.avgSpeed.toFixed(1)} km/h avg
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(ride.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null;
+        })()}
       </div>
     </div>
   );

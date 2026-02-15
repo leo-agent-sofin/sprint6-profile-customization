@@ -91,15 +91,23 @@ export default function DashboardPage() {
             </p>
           </Link>
 
-          <div className="block p-8 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-lg border-2 border-dashed border-purple-200">
-            <div className="text-5xl mb-4">🎯</div>
-            <h3 className="text-2xl font-bold mb-2 text-gray-900">
-              Goals Coming Soon
+          <Link 
+            href="/feed"
+            className="group block p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 border border-gray-100"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-5xl group-hover:scale-110 transition-transform">🌟</div>
+              <svg className="w-6 h-6 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold mb-2 text-gray-900 group-hover:text-blue-600 transition-colors">
+              Activity Feed
             </h3>
             <p className="text-gray-600">
-              Set and track your personal goals and milestones
+              See what your cycling community is up to and give kudos
             </p>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

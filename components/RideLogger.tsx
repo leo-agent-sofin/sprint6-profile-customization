@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { rides } from '@/lib/rides';
+import { social } from '@/lib/social';
+import { storage } from '@/lib/storage';
 
 interface RideLoggerProps {
   onRideLogged?: () => void;
@@ -56,7 +58,19 @@ export default function RideLogger({ onRideLogged }: RideLoggerProps) {
       const minutesNum = parseInt(minutes || '0');
       const totalMinutes = hoursNum * 60 + minutesNum;
 
-      rides.add(distanceNum, elevationNum, totalMinutes);
+      const ride = rides.add(distanceNum, elevationNum, totalMinutes);
+
+      // Add to social feed
+      const profile = storage.getProfile();
+      const userName = profile ? profile.name : 'New User';
+      const userAvatar = profile ? profile.avatar_url : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Default';
+      
+      social.addActivity(userName, userAvatar, {
+        distance: ride.distance,
+        elevation: ride.elevationGain,
+        duration: ride.duration,
+        avgSpeed: ride.avgSpeed
+      });
 
       // Reset form
       setDistance('');
