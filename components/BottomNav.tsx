@@ -8,6 +8,7 @@ export default function BottomNav() {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: '📊' },
+    { href: '/clubs', label: 'Clubs', icon: '🚴' },
     { href: '/feed', label: 'Feed', icon: '🌟' },
     { href: '/profile', label: 'Profile', icon: '👤' }
   ];
